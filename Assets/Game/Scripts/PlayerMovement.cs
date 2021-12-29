@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
+  public bool PlayerCanMove;
+
   [SerializeField] private float timeMultiplier = 5f;
   [SerializeField] private float downForce = -10f;
   [SerializeField] private float jumpForce = 3f;
@@ -13,8 +14,11 @@ public class PlayerMovement : MonoBehaviour
 
   private void Update()
   {
-    MoveVertical();
-    CalculateAngle();
+    if (PlayerCanMove)
+    {
+      MoveVertical();
+      CalculateAngle();
+    }
   }
 
   private void MoveVertical()
