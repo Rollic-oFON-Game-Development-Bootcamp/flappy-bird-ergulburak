@@ -46,7 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ade188586aae2e4392bdd52e25e629d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeMultiplier: 10
+  PlayerCanMove: 0
+  timeMultiplier: 6
   downForce: -10
   jumpForce: 3
   maxRotationAngle: 50

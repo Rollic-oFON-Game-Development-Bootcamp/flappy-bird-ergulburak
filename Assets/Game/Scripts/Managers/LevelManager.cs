@@ -1,32 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Game.Scripts.Managers
 {
   public class LevelManager : MonoBehaviour
   {
-    private const float pipeWidth = 2.5f;
     private const float pipeHeadHeight = 1.25f;
     private const float cameraOrthograficSize = 10f;
+    private const float pipeHeightLimit = 20f;
+    private const float pipeDestroyPosition = -30f;
+    private const float pipeSpawnPosition = 30f;
 
-    private List<GameObject> obstacles = new List<GameObject>();
+    private List<Pipe> obstacles = new List<Pipe>();
+    private float pipeRangeLimit = 6f;
+    private int pipesSpawned;
 
     [SerializeField] private float pipeSpeed = 3f;
+    [SerializeField] [Range(.2f, 5f)] private float pipeSpawnTimer;
+    [SerializeField] private GameObject pipeParentPrefab;
     [SerializeField] private GameObject pipeHeadPrefab;
     [SerializeField] private GameObject pipeBodyPrefab;
 
-    private void Start()
+    private void Awake()
     {
-      //CreatePipe(10f, 10f, true);
-      //CreatePipe(10f, 10f, false);
-      //CreatePipe(20f, 20f, true);
-      //CreatePipe(20f, 20f, false);
-
-      CreateObstacle(10f, 3f, 10f);
-      CreateObstacle(8f, 3f, 5f);
-      CreateObstacle(5f, 3f, 15f);
-      CreateObstacle(15f, 3f, 20f);
+      StartSpawning();
+      SetDifficulty(Difficulty.Easy);
     }
 
     private void Update()
@@ -36,10 +37,66 @@ namespace Game.Scripts.Managers
 
     private void PipeMovement()
     {
-      foreach (var obstacle in obstacles)
+      foreach (var obstacle in obstacles.ToList())
       {
-        obstacle.transform.Translate(new Vector3(-1, 0, 0) * pipeSpeed * Time.deltaTime);
+        obstacle.Move();
+        if (obstacle.PipeXPosition() < pipeDestroyPosition)
+        {
+          Destroy(obstacle.gameObject);
+          obstacles.Remove(obstacle);
+        }
       }
+    }
+
+    public void StartSpawning()
+    {
+      InvokeRepeating(nameof(PipeSpawning), 0f, pipeSpawnTimer);
+    }
+
+    public void StopSpawning()
+    {
+      CancelInvoke(nameof(PipeSpawning));
+    }
+
+
+    private void SetDifficulty(Difficulty difficulty)
+    {
+      switch (difficulty)
+      {
+        case Difficulty.Easy:
+          pipeRangeLimit = 10f;
+          break;
+        case Difficulty.Medium:
+          pipeRangeLimit = 8f;
+          break;
+        case Difficulty.Hard:
+          pipeRangeLimit = 6f;
+          break;
+        case Difficulty.Impossible:
+          pipeRangeLimit = 5f;
+          break;
+        default:
+          throw new ArgumentOutOfRangeException(nameof(difficulty), difficulty, null);
+      }
+    }
+
+    private Difficulty GetDifficulty()
+    {
+      if (pipesSpawned >= 30) return Difficulty.Impossible;
+      if (pipesSpawned >= 20) return Difficulty.Hard;
+      if (pipesSpawned >= 10) return Difficulty.Medium;
+      return Difficulty.Easy;
+    }
+
+    private void PipeSpawning()
+    {
+      var heightEdgeLimit = 2f;
+      var minHeight = pipeRangeLimit * .5f + heightEdgeLimit;
+      var maxHeight = pipeHeightLimit - pipeRangeLimit * .5f - heightEdgeLimit;
+      var randomHeight = Random.Range(minHeight, maxHeight);
+      CreateObstacle(randomHeight, pipeRangeLimit, pipeSpawnPosition);
+      pipesSpawned++;
+      SetDifficulty(GetDifficulty());
     }
 
     private void CreateObstacle(float yHeight, float rangeSize, float xPosition)
@@ -47,11 +104,35 @@ namespace Game.Scripts.Managers
       var bottomHeight = yHeight - rangeSize / 2f;
       var topHeight = cameraOrthograficSize * 2f - yHeight - rangeSize / 2f;
 
-      CreatePipe(bottomHeight, xPosition, true);
-      CreatePipe(topHeight, xPosition, false);
+      var bottomList = CreatePipe(bottomHeight, true);
+      var topList = CreatePipe(topHeight, false);
+
+      var pipeParent = Instantiate(pipeParentPrefab);
+
+      foreach (var obj in bottomList)
+      {
+        obj.transform.SetParent(pipeParent.transform);
+      }
+
+      foreach (var obj in topList)
+      {
+        obj.transform.SetParent(pipeParent.transform);
+      }
+
+      pipeParent.transform.position = new Vector3(xPosition, 0);
+
+      var pipeRigidBody = pipeParent.AddComponent<Rigidbody2D>();
+      pipeRigidBody.isKinematic = true;
+
+      var pipeScript = pipeParent.AddComponent<Pipe>();
+      pipeScript.SetTopPipe(topList);
+      pipeScript.SetBottomPipe(bottomList);
+      pipeScript.SetSpeed(pipeSpeed);
+
+      obstacles.Add(pipeScript);
     }
 
-    private void CreatePipe(float height, float xPosition, bool isLookingUp)
+    private List<GameObject> CreatePipe(float height, bool isLookingUp)
     {
       float pipeHeadYPos;
       float pipeBodyYPos;
@@ -66,20 +147,15 @@ namespace Game.Scripts.Managers
         pipeBodyYPos = +cameraOrthograficSize;
       }
 
-
       var pipeHead = Instantiate(pipeHeadPrefab);
-      pipeHead.transform.position = new Vector3(xPosition, pipeHeadYPos);
+      pipeHead.transform.position = new Vector3(0, pipeHeadYPos);
 
       var pipeBody = Instantiate(pipeBodyPrefab);
-      pipeBody.transform.position = new Vector3(xPosition, pipeBodyYPos);
+      pipeBody.transform.position = new Vector3(0, pipeBodyYPos);
+      pipeBody.transform.localScale = new Vector3(1, isLookingUp ? height : -height, 1);
 
-      var pipeBodySpriteRenderer = pipeBody.GetComponent<SpriteRenderer>();
-      pipeBodySpriteRenderer.size = new Vector2(pipeWidth, height);
-      pipeBody.transform.localScale = new Vector3(1, isLookingUp ? 1 : -1, 1);
-
-      var pipeBodyBoxCollider = pipeBody.GetComponent<BoxCollider2D>();
-      pipeBodyBoxCollider.size = new Vector2(pipeWidth, height);
-      pipeBodyBoxCollider.offset = new Vector2(0f, height / 2f);
+      var pipeBodyList = new List<GameObject>() { pipeBody, pipeHead };
+      return pipeBodyList;
     }
   }
 }

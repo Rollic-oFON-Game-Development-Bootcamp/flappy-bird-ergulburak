@@ -32,7 +32,7 @@ public class PlayerMovement : MonoBehaviour
 
   private void CalculateAngle()
   {
-    var rot = Mathf.Clamp(direction.y * 90, -maxRotationAngle, maxRotationAngle);
+    var rot = Mathf.Clamp(direction.y * 45, -maxRotationAngle, maxRotationAngle);
     transform.eulerAngles = new Vector3(0, 0, rot);
   }
 }
