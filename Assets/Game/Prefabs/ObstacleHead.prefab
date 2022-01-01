@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 8451604082106928958}
   - component: {fileID: 2560642714255223364}
   m_Layer: 0
-  m_Name: PipeHead
-  m_TagString: Untagged
+  m_Name: ObstacleHead
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

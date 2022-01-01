@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 430344152115403175}
   - component: {fileID: 430344152115403174}
   m_Layer: 0
-  m_Name: Bird
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,8 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ade188586aae2e4392bdd52e25e629d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCanMove: 0
-  timeMultiplier: 6
+  timeMultiplier: 5
   downForce: -10
   jumpForce: 3
   maxRotationAngle: 50
@@ -90,7 +89,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: e8585b4c608ceae4f834fab8e477116b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

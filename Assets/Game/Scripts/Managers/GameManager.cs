@@ -1,27 +1,50 @@
 ﻿using System;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
-  private GameStates states = GameStates.Menu;
-  private PlayerMovement playerMovement => FindObjectOfType<PlayerMovement>();
+  private GameStates state = GameStates.Menu;
+  private Player Player => FindObjectOfType<Player>();
   private bool isGameStarted = false;
 
-  private void Update()
+  private void OnEnable()
   {
-    switch (states)
+    InputManager.Instance.OnClick += OnGameStarted;
+  }
+
+  private void OnDisable()
+  {
+    InputManager.Instance.OnClick -= OnGameStarted;
+  }
+
+  private void OnGameStarted(object sender, bool e)
+  {
+    if (!isGameStarted)
+    {
+      isGameStarted = !isGameStarted;
+      HandleStates();
+    }
+  }
+
+  public void ListenState(GameStates newState)
+  {
+    state = newState;
+    HandleStates();
+  }
+
+  private void HandleStates()
+  {
+    switch (state)
     {
       case GameStates.Menu:
-        if (!isGameStarted)
-        {
-          isGameStarted = Input.GetMouseButtonDown(0);
-          playerMovement.PlayerCanMove = isGameStarted;
-        }
-
+        Player.Instance.PlayerCanMove = isGameStarted;
+        LevelManager.Instance.StartSpawning();
         break;
       case GameStates.InGame:
         break;
       case GameStates.End:
+        Player.Instance.PlayerCanMove = false;
+        LevelManager.Instance.StopSpawning();
         break;
     }
   }
