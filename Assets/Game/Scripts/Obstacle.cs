@@ -15,12 +15,12 @@ public class Obstacle : MonoBehaviour
   {
     obstacleSpeed = speed;
     var bottomHeight = yHeight - rangeSize / 2f;
-    var topHeight = LevelConsts.cameraOrthograficSize * 2f - yHeight - rangeSize / 2f;
+    var topHeight = LevelConsts.CameraOrthograficSize * 2f - yHeight - rangeSize / 2f;
 
     var bottomList = CreateObstacle(obstacleBodyPrefab, obstacleHeadPrefab, bottomHeight, true);
     var topList = CreateObstacle(obstacleBodyPrefab, obstacleHeadPrefab, topHeight, false);
 
-    transform.position = new Vector3(LevelConsts.pipeSpawnPosition, 0);
+    transform.position = new Vector3(LevelConsts.ObstacleSpawnPosition, 0);
 
     var pipeRigidBody = gameObject.AddComponent<Rigidbody2D>();
     pipeRigidBody.isKinematic = true;
@@ -37,13 +37,13 @@ public class Obstacle : MonoBehaviour
 
     if (isLookingUp)
     {
-      pipeHeadYPos = -LevelConsts.cameraOrthograficSize + height - LevelConsts.pipeHeadHeight * .45f;
-      pipeBodyYPos = -LevelConsts.cameraOrthograficSize;
+      pipeHeadYPos = -LevelConsts.CameraOrthograficSize + height - LevelConsts.ObstacleHeadHeight * .45f;
+      pipeBodyYPos = -LevelConsts.CameraOrthograficSize;
     }
     else
     {
-      pipeHeadYPos = +LevelConsts.cameraOrthograficSize - height + LevelConsts.pipeHeadHeight * .45f;
-      pipeBodyYPos = +LevelConsts.cameraOrthograficSize;
+      pipeHeadYPos = +LevelConsts.CameraOrthograficSize - height + LevelConsts.ObstacleHeadHeight * .45f;
+      pipeBodyYPos = +LevelConsts.CameraOrthograficSize;
     }
 
     var pipeHead = Instantiate(pipeHeadPrefab, transform);
@@ -61,7 +61,6 @@ public class Obstacle : MonoBehaviour
   {
     if (!bodyList.Count.Equals(2))
     {
-      Debug.LogError("Liste eksik!");
       return;
     }
 
@@ -73,7 +72,6 @@ public class Obstacle : MonoBehaviour
   {
     if (!bodyList.Count.Equals(2))
     {
-      Debug.LogError("Liste eksik!");
       return;
     }
 

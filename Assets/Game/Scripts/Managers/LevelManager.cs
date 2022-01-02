@@ -7,6 +7,8 @@ using Random = UnityEngine.Random;
 
 public class LevelManager : Singleton<LevelManager>
 {
+  public event EventHandler<int> OnObstaclePassed;
+
   private List<Obstacle> obstacles = new List<Obstacle>();
   private float pipeRangeLimit = 6f;
   private int pipesSpawned;
@@ -30,11 +32,15 @@ public class LevelManager : Singleton<LevelManager>
   {
     foreach (var obstacle in obstacles.ToList())
     {
-      bool isPlayerPassTheObstacle = obstacle.GetObstacleXPosition() > LevelConsts.playerXPosition;
+      bool isPlayerPassTheObstacle = obstacle.GetObstacleXPosition() > LevelConsts.PlayerXPosition;
       obstacle.Move();
-      if (isPlayerPassTheObstacle && obstacle.GetObstacleXPosition() <= LevelConsts.playerXPosition)
+      if (isPlayerPassTheObstacle && obstacle.GetObstacleXPosition() <= LevelConsts.PlayerXPosition)
+      {
         pipesPassed++;
-      if (obstacle.GetObstacleXPosition() < LevelConsts.pipeDestroyPosition)
+        OnObstaclePassed?.Invoke(this, pipesPassed);
+      }
+
+      if (obstacle.GetObstacleXPosition() < LevelConsts.ObstacleDestroyPosition)
       {
         Destroy(obstacle.gameObject);
         obstacles.Remove(obstacle);
@@ -90,7 +96,7 @@ public class LevelManager : Singleton<LevelManager>
   {
     var heightEdgeLimit = 2f;
     var minHeight = pipeRangeLimit * .5f + heightEdgeLimit;
-    var maxHeight = LevelConsts.pipeHeightLimit - pipeRangeLimit * .5f - heightEdgeLimit;
+    var maxHeight = LevelConsts.ObstacleHeightLimit - pipeRangeLimit * .5f - heightEdgeLimit;
     var randomHeight = Random.Range(minHeight, maxHeight);
     CreateObstacle(randomHeight);
     pipesSpawned++;

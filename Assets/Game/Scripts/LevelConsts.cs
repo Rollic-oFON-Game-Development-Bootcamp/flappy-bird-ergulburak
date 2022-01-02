@@ -1,9 +1,9 @@
 ﻿public struct LevelConsts
 {
-  public const float pipeHeadHeight = 1.25f;
-  public const float cameraOrthograficSize = 10f;
-  public const float pipeHeightLimit = 20f;
-  public const float pipeDestroyPosition = -30f;
-  public const float pipeSpawnPosition = 30f;
-  public const float playerXPosition = 0f;
+  public const float ObstacleHeadHeight = 1.25f;
+  public const float CameraOrthograficSize = 10f;
+  public const float ObstacleHeightLimit = 20f;
+  public const float ObstacleDestroyPosition = -30f;
+  public const float ObstacleSpawnPosition = 30f;
+  public const float PlayerXPosition = 0f;
 }

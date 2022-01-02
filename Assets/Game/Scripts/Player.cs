@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class Player : Singleton<Player>
 {
-  public bool PlayerCanMove { get; set; }
+  public bool PlayerCanMove;
+  public event EventHandler OnPlayerDied;
 
   [SerializeField] private float timeMultiplier = 5f;
   [SerializeField] private float downForce = -10f;
@@ -14,14 +15,9 @@ public class Player : Singleton<Player>
 
   private Vector3 direction = Vector3.zero;
 
-  private void OnEnable()
+  private void Start()
   {
     InputManager.Instance.OnClick += ClickDetect;
-  }
-
-  private void OnDisable()
-  {
-    InputManager.Instance.OnClick -= ClickDetect;
   }
 
   private void ClickDetect(object sender, bool e)
@@ -44,6 +40,7 @@ public class Player : Singleton<Player>
       ? jumpForce
       : direction.y + (downForce * Time.deltaTime);
     transform.Translate(direction * Time.deltaTime * timeMultiplier, Space.World);
+    playerClick = playerClick ? !playerClick : playerClick;
   }
 
   private void CalculateAngle()
@@ -56,7 +53,7 @@ public class Player : Singleton<Player>
   {
     if (col.CompareTag("Obstacle"))
     {
-      GameManager.Instance.ListenState(GameStates.End);
+      OnPlayerDied?.Invoke(this, EventArgs.Empty);
     }
   }
 }

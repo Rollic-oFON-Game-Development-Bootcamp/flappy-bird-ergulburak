@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 430344152115403170}
   - component: {fileID: 430344152115403169}
+  - component: {fileID: 8916974673232866211}
   - component: {fileID: 430344152115403168}
   - component: {fileID: 430344152115403175}
   - component: {fileID: 430344152115403174}
@@ -46,10 +47,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ade188586aae2e4392bdd52e25e629d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerCanMove: 0
   timeMultiplier: 5
   downForce: -10
   jumpForce: 3
   maxRotationAngle: 50
+--- !u!114 &8916974673232866211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 430344152115403173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee31125e18084bbb8fe75145745323c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flipSprite: {fileID: 21300000, guid: 657099a2b7dcc3443aaba6125c8c4550, type: 3}
+  flopSprite: {fileID: 21300000, guid: 94b965483067db245a8dc11222fab9ec, type: 3}
 --- !u!212 &430344152115403168
 SpriteRenderer:
   m_ObjectHideFlags: 0

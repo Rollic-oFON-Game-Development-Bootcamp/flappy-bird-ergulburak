@@ -1,20 +1,36 @@
 ﻿using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
-  private GameStates state = GameStates.Menu;
-  private Player Player => FindObjectOfType<Player>();
-  private bool isGameStarted = false;
+  [SerializeField] [ReadOnly] private GameStates state = GameStates.Menu;
+  private bool isGameStarted;
+  private int highScore;
 
-  private void OnEnable()
+  private void Start()
   {
+    highScore = PlayerPrefs.GetInt("HighScore", 0);
     InputManager.Instance.OnClick += OnGameStarted;
+    Player.Instance.OnPlayerDied += OnPlayerDied;
+    UIManager.Instance.OnRetry += OnRetry;
   }
 
-  private void OnDisable()
+  public int GetHighScore()
   {
-    InputManager.Instance.OnClick -= OnGameStarted;
+    return highScore;
+  }
+
+  private void OnRetry(object sender, EventArgs e)
+  {
+    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+  }
+
+  private void OnPlayerDied(object sender, EventArgs e)
+  {
+    state = GameStates.End;
+    HandleStates();
   }
 
   private void OnGameStarted(object sender, bool e)
@@ -22,14 +38,9 @@ public class GameManager : Singleton<GameManager>
     if (!isGameStarted)
     {
       isGameStarted = !isGameStarted;
+      state = GameStates.InGame;
       HandleStates();
     }
-  }
-
-  public void ListenState(GameStates newState)
-  {
-    state = newState;
-    HandleStates();
   }
 
   private void HandleStates()
@@ -37,14 +48,23 @@ public class GameManager : Singleton<GameManager>
     switch (state)
     {
       case GameStates.Menu:
-        Player.Instance.PlayerCanMove = isGameStarted;
-        LevelManager.Instance.StartSpawning();
         break;
       case GameStates.InGame:
+        UIManager.Instance.OnGameStart();
+        Player.Instance.PlayerCanMove = true;
+        LevelManager.Instance.StartSpawning();
         break;
       case GameStates.End:
+
+        if (LevelManager.Instance.GetPipesPassed() > highScore)
+        {
+          highScore = LevelManager.Instance.GetPipesPassed();
+          PlayerPrefs.SetInt("HighScore", highScore);
+        }
+
         Player.Instance.PlayerCanMove = false;
         LevelManager.Instance.StopSpawning();
+        UIManager.Instance.OnGameOver();
         break;
     }
   }
