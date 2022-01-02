@@ -56,9 +56,9 @@ public class GameManager : Singleton<GameManager>
         break;
       case GameStates.End:
 
-        if (LevelManager.Instance.GetPipesPassed() > highScore)
+        if (LevelManager.Instance.GetObstaclesPassed() > highScore)
         {
-          highScore = LevelManager.Instance.GetPipesPassed();
+          highScore = LevelManager.Instance.GetObstaclesPassed();
           PlayerPrefs.SetInt("HighScore", highScore);
         }
 

@@ -10,25 +10,25 @@ public class LevelManager : Singleton<LevelManager>
   public event EventHandler<int> OnObstaclePassed;
 
   private List<Obstacle> obstacles = new List<Obstacle>();
-  private float pipeRangeLimit = 6f;
-  private int pipesSpawned;
-  private int pipesPassed;
+  private float obstacleRangeLimit = 6f;
+  private int obstaclesSpawned;
+  private int obstaclesPassed;
   private bool isTheGameBeingPlayed;
 
-  [SerializeField] private float pipeSpeed = 5f;
-  [SerializeField] [Range(.2f, 5f)] private float pipeSpawnTimer;
-  [SerializeField] private GameObject pipeParentPrefab;
-  [SerializeField] private GameObject pipeHeadPrefab;
-  [SerializeField] private GameObject pipeBodyPrefab;
+  [SerializeField] private float obstacleSpeed = 5f;
+  [SerializeField] [Range(.2f, 5f)] private float obstacleSpawnTimer;
+  [SerializeField] private GameObject obstacleParentPrefab;
+  [SerializeField] private GameObject obstacleHeadPrefab;
+  [SerializeField] private GameObject obstacleBodyPrefab;
   [SerializeField] [ReadOnly] private Difficulty difficulty = Difficulty.Easy;
 
   private void Update()
   {
     if (isTheGameBeingPlayed)
-      PipeMovement();
+      ObstacleMovement();
   }
 
-  private void PipeMovement()
+  private void ObstacleMovement()
   {
     foreach (var obstacle in obstacles.ToList())
     {
@@ -36,8 +36,8 @@ public class LevelManager : Singleton<LevelManager>
       obstacle.Move();
       if (isPlayerPassTheObstacle && obstacle.GetObstacleXPosition() <= LevelConsts.PlayerXPosition)
       {
-        pipesPassed++;
-        OnObstaclePassed?.Invoke(this, pipesPassed);
+        obstaclesPassed++;
+        OnObstaclePassed?.Invoke(this, obstaclesPassed);
       }
 
       if (obstacle.GetObstacleXPosition() < LevelConsts.ObstacleDestroyPosition)
@@ -51,14 +51,14 @@ public class LevelManager : Singleton<LevelManager>
   public void StartSpawning()
   {
     SetDifficulty();
-    InvokeRepeating(nameof(PipeSpawning), 0f, pipeSpawnTimer);
+    InvokeRepeating(nameof(ObstacleSpawning), 0f, obstacleSpawnTimer);
     isTheGameBeingPlayed = true;
   }
 
   public void StopSpawning()
   {
     isTheGameBeingPlayed = false;
-    CancelInvoke(nameof(PipeSpawning));
+    CancelInvoke(nameof(ObstacleSpawning));
   }
 
 
@@ -68,16 +68,16 @@ public class LevelManager : Singleton<LevelManager>
     switch (difficulty)
     {
       case Difficulty.Easy:
-        pipeRangeLimit = 10f;
+        obstacleRangeLimit = 10f;
         break;
       case Difficulty.Medium:
-        pipeRangeLimit = 8f;
+        obstacleRangeLimit = 8f;
         break;
       case Difficulty.Hard:
-        pipeRangeLimit = 6f;
+        obstacleRangeLimit = 6f;
         break;
       case Difficulty.Impossible:
-        pipeRangeLimit = 5f;
+        obstacleRangeLimit = 5f;
         break;
       default:
         throw new ArgumentOutOfRangeException(nameof(difficulty), difficulty, null);
@@ -86,33 +86,33 @@ public class LevelManager : Singleton<LevelManager>
 
   private void CalculateDifficulty()
   {
-    if (pipesSpawned >= 30) difficulty = Difficulty.Impossible;
-    if (pipesSpawned >= 20) difficulty = Difficulty.Hard;
-    if (pipesSpawned >= 10) difficulty = Difficulty.Medium;
+    if (obstaclesSpawned >= 30) difficulty = Difficulty.Impossible;
+    if (obstaclesSpawned >= 20) difficulty = Difficulty.Hard;
+    if (obstaclesSpawned >= 10) difficulty = Difficulty.Medium;
     difficulty = Difficulty.Easy;
   }
 
-  private void PipeSpawning()
+  private void ObstacleSpawning()
   {
     var heightEdgeLimit = 2f;
-    var minHeight = pipeRangeLimit * .5f + heightEdgeLimit;
-    var maxHeight = LevelConsts.ObstacleHeightLimit - pipeRangeLimit * .5f - heightEdgeLimit;
+    var minHeight = obstacleRangeLimit * .5f + heightEdgeLimit;
+    var maxHeight = LevelConsts.ObstacleHeightLimit - obstacleRangeLimit * .5f - heightEdgeLimit;
     var randomHeight = Random.Range(minHeight, maxHeight);
     CreateObstacle(randomHeight);
-    pipesSpawned++;
+    obstaclesSpawned++;
     SetDifficulty();
   }
 
   private void CreateObstacle(float randomHeight)
   {
-    var pipeParent = Instantiate(pipeParentPrefab);
-    var pipeScript = pipeParent.GetComponent<Obstacle>();
-    pipeScript.Initialize(pipeBodyPrefab, pipeHeadPrefab, randomHeight, pipeRangeLimit, pipeSpeed);
-    obstacles.Add(pipeScript);
+    var obstacleParent = Instantiate(obstacleParentPrefab);
+    var obstacleScript = obstacleParent.GetComponent<Obstacle>();
+    obstacleScript.Initialize(obstacleBodyPrefab, obstacleHeadPrefab, randomHeight, obstacleRangeLimit, obstacleSpeed);
+    obstacles.Add(obstacleScript);
   }
 
-  public int GetPipesPassed()
+  public int GetObstaclesPassed()
   {
-    return pipesPassed;
+    return obstaclesPassed;
   }
 }
